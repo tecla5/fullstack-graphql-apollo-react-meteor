@@ -13,6 +13,12 @@ export default {
         name
       });
       return Resolutions.findOne(resolutionId);
+    },
+    deleteResolution(obj, args, ctx) {
+      console.log("args", args);
+      const resolution = Resolutions.findOne(args._id);
+      Resolutions.remove(args._id);
+      return resolution;
     }
   }
 };

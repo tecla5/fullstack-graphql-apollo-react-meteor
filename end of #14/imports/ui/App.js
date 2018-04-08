@@ -1,16 +1,25 @@
 import React from "react";
 import gql from "graphql-tag";
-import { graphql } from "react-apollo";
+import { graphql, compose } from "react-apollo";
 import ResolutionForm from "./ResolutionForm";
 
-const App = ({ loading, resolutions }) => {
-  if (loading) return null;
+const App = ({ resolutionsQuery, deleteResolution }) => {
+  if (resolutionsQuery.loading) return null;
   return (
     <div>
       <ResolutionForm />
       <ul>
-        {resolutions.map(resolution => (
-          <li key={resolution._id}>{resolution.name}</li>
+        {resolutionsQuery.resolutions.map(resolution => (
+          <li key={resolution._id}>
+            <button
+              onClick={() =>
+                deleteResolution({ variables: { _id: resolution._id } })
+              }
+            >
+              x
+            </button>
+            {resolution.name}
+          </li>
         ))}
       </ul>
     </div>
@@ -26,6 +35,22 @@ const resolutionsQuery = gql`
   }
 `;
 
-export default graphql(resolutionsQuery, {
-  props: ({ data }) => ({ ...data })
-})(App);
+const deleteResolution = gql`
+  mutation deleteResolution($_id: String!) {
+    deleteResolution(_id: $_id) {
+      _id
+    }
+  }
+`;
+
+export default compose(
+  graphql(resolutionsQuery, {
+    name: "resolutionsQuery"
+  }),
+  graphql(deleteResolution, {
+    name: "deleteResolution",
+    options: {
+      refetchQueries: ["Resolutions"]
+    }
+  })
+)(App);
