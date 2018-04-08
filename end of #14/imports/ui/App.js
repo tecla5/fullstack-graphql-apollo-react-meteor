@@ -2,55 +2,47 @@ import React from "react";
 import gql from "graphql-tag";
 import { graphql, compose } from "react-apollo";
 import ResolutionForm from "./ResolutionForm";
+import random from "lodash/random";
 
-const App = ({ resolutionsQuery, deleteResolution }) => {
-  if (resolutionsQuery.loading) return null;
+const PhotoBlock = ({ backString }) => (
+  <div style={{ display: "inline-block" }}>
+    <div
+      style={{
+        height: "300px",
+        width: "300px",
+        backgroundImage: backString.join(", "),
+        backgroundBlendMode: "multiply",
+        backgroundSize: `${random(100, 300)}%, ${random(100, 300)}%`,
+        backgroundPositionX: `${random(0, 100)}%, ${random(0, 100)}%`,
+        backgroundPositionY: `${random(0, 100)}%, ${random(0, 100)}%`
+      }}
+    />
+  </div>
+);
+
+const App = ({ ComboPhotos }) => {
+  if (ComboPhotos.loading) return null;
+  const backString = ComboPhotos.ComboPhotos.map(pho => `url(${pho.url})`);
   return (
     <div>
-      <ResolutionForm />
-      <ul>
-        {resolutionsQuery.resolutions.map(resolution => (
-          <li key={resolution._id}>
-            <button
-              onClick={() =>
-                deleteResolution({ variables: { _id: resolution._id } })
-              }
-            >
-              x
-            </button>
-            {resolution.name}
-          </li>
-        ))}
-      </ul>
+      <PhotoBlock backString={backString} />
+      <PhotoBlock backString={backString} />
+      <PhotoBlock backString={backString} />
     </div>
   );
 };
 
-const resolutionsQuery = gql`
-  query Resolutions {
-    resolutions {
+const ComboPhotos = gql`
+  query ComboPhotos {
+    ComboPhotos {
       _id
-      name
-    }
-  }
-`;
-
-const deleteResolution = gql`
-  mutation deleteResolution($_id: String!) {
-    deleteResolution(_id: $_id) {
-      _id
+      url
     }
   }
 `;
 
 export default compose(
-  graphql(resolutionsQuery, {
-    name: "resolutionsQuery"
-  }),
-  graphql(deleteResolution, {
-    name: "deleteResolution",
-    options: {
-      refetchQueries: ["Resolutions"]
-    }
+  graphql(ComboPhotos, {
+    name: "ComboPhotos"
   })
 )(App);
