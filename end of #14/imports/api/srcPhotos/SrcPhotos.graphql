@@ -2,4 +2,5 @@ type SrcPhotos {
   _id: String!
   url: String!
   type: String!
+  size: String!
 }

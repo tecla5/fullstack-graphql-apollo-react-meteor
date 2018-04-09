@@ -7,7 +7,7 @@ import ResolutionsResolvers from "../../api/resolutions/resolvers";
 
 import SrcPhotosSchema from "../../api/srcPhotos/SrcPhotos.graphql";
 import SrcPhotosResolvers from "../../api/srcPhotos/resolvers";
-//ds
+//dsd
 const testSchema = `
 type Query {
   hi: String

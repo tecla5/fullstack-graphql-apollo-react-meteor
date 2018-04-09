@@ -4,17 +4,30 @@ import { graphql, compose } from "react-apollo";
 import ResolutionForm from "./ResolutionForm";
 import random from "lodash/random";
 
-const PhotoBlock = ({ backString }) => (
+function getRandomColor() {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+const PhotoBlock = ({ photos }) => (
   <div style={{ display: "inline-block" }}>
     <div
       style={{
-        height: "300px",
-        width: "300px",
-        backgroundImage: backString.join(", "),
+        height: "500px",
+        width: "500px",
+        // backgroundColor: getRandomColor(),
+        backgroundImage: photos.map(photo => `url(${photo.url})`).join(", "),
         backgroundBlendMode: "multiply",
-        backgroundSize: `${random(100, 300)}%, ${random(100, 300)}%`,
-        backgroundPositionX: `${random(0, 100)}%, ${random(0, 100)}%`,
-        backgroundPositionY: `${random(0, 100)}%, ${random(0, 100)}%`
+        backgroundSize: photos
+          .map(p => `${random(20 * p.size, 100 * p.size)}%`)
+          .join(", "),
+        backgroundPositionX: photos.map(p => `${random(0, 100)}%`).join(", "),
+        backgroundPositionY: photos.map(p => `${random(0, 100)}%`).join(", "),
+        backgroundRepeat: "no-repeat"
       }}
     />
   </div>
@@ -22,12 +35,19 @@ const PhotoBlock = ({ backString }) => (
 
 const App = ({ ComboPhotos }) => {
   if (ComboPhotos.loading) return null;
-  const backString = ComboPhotos.ComboPhotos.map(pho => `url(${pho.url})`);
   return (
     <div>
-      <PhotoBlock backString={backString} />
-      <PhotoBlock backString={backString} />
-      <PhotoBlock backString={backString} />
+      <PhotoBlock photos={ComboPhotos.ComboPhotos} />
+      <PhotoBlock photos={ComboPhotos.ComboPhotos} />
+      <PhotoBlock photos={ComboPhotos.ComboPhotos} />
+      <PhotoBlock photos={ComboPhotos.ComboPhotos} />
+      <br />
+      {ComboPhotos.ComboPhotos.map(p => (
+        <a href={p.url} target="blank" key={p._id}>
+          {" "}
+          <img src={p.url} style={{ width: "300px" }} />
+        </a>
+      ))}
     </div>
   );
 };
@@ -37,6 +57,7 @@ const ComboPhotos = gql`
     ComboPhotos {
       _id
       url
+      size
     }
   }
 `;
